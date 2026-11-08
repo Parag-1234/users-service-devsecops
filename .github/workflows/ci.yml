@@ -36,7 +36,7 @@ jobs:
       - name: Build, test and analyze with SonarCloud
         run: >
           mvn -B clean verify
-          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          invalid-goal
           -Dsonar.organization=parag-1234-1
           -Dsonar.projectKey=Parag-1234_users-service-devsecops
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
@@ -61,3 +61,5 @@ jobs:
         uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
