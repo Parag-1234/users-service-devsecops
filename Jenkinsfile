@@ -38,8 +38,13 @@ pipeline {
         stage('Build and Unit Tests') {
             steps {
                 sh '''
+                    set -e
+
+                    mkdir -p "$HOME/.m2/repository"
+
                     docker run --rm \
                       -v "$WORKSPACE:/workspace" \
+                      -v "$HOME/.m2:/root/.m2" \
                       -w /workspace \
                       maven:3.9.9-eclipse-temurin-21 \
                       mvn clean verify
@@ -259,7 +264,6 @@ pipeline {
                 sh '''
                     python3 - <<'PY'
 import json
-import os
 from html import escape
 
 STYLE = """
@@ -275,7 +279,7 @@ def load_json(path):
     try:
         with open(path) as f:
             return json.load(f)
-    except Exception as exc:
+    except Exception:
         return None
 
 def write_table(path, title, headers, rows, message=None):
