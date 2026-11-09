@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -13,6 +14,16 @@ pipeline {
             }
         }
 
+        stage('Semgrep Security Scan') {
+            steps {
+                sh '''
+                    /opt/semgrep-venv/bin/semgrep scan \
+                      --config auto \
+                      --error .
+                '''
+            }
+        }
+
         stage('Build and Unit Tests') {
             steps {
                 sh '''
@@ -24,6 +35,19 @@ pipeline {
                 '''
             }
         }
+
+        stage('Publish JaCoCo Report') {
+            steps {
+                publishHTML(target: [
+                    reportName: 'JaCoCo Coverage Report',
+                    reportDir: 'target/site/jacoco',
+                    reportFiles: 'index.html',
+                    keepAll: true,
+                    alwaysLinkToLastBuild: true,
+                    allowMissing: false
+                ])
+            }
+        }
     }
 
     post {
@@ -31,10 +55,10 @@ pipeline {
             echo 'QA pipeline execution completed.'
         }
         success {
-            echo 'Build and unit tests passed.'
+            echo 'Security scan, build and unit tests passed.'
         }
         failure {
-            echo 'Build or unit tests failed.'
+            echo 'QA pipeline failed. Check the failed stage.'
         }
     }
 }
